@@ -7,3 +7,4 @@ firebase-admin>=6.5.0
 cryptography>=42.0.0
 passlib[bcrypt]>=1.7.4
 pypdf>=4.1.0
+mangum>=0.17.0
