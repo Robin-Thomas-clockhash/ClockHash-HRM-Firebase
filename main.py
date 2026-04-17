@@ -127,3 +127,8 @@ async def global_exception_handler(request, exc):
 
 
 logger.info("Application startup complete. Docs at /docs")
+
+
+@app.get("/")
+def home():
+    return {"message": "API is working"}
