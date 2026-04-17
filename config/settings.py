@@ -15,7 +15,16 @@ class Settings(BaseSettings):
     )
 
     # Firebase
-    firebase_credentials_json: str = ""
+    firebase_credentials_json_type: str = "service_account"
+    firebase_credentials_json_project_id: str = ""
+    firebase_credentials_json_private_key_id: str = ""
+    firebase_credentials_json_private_key: str = ""
+    firebase_credentials_json_client_email: str = ""
+    firebase_credentials_json_client_id: str = ""
+    firebase_credentials_json_auth_uri: str = "https://accounts.google.com/o/oauth2/auth"
+    firebase_credentials_json_token_uri: str = "https://oauth2.googleapis.com/token"
+    firebase_credentials_json_auth_provider_x509_cert_url: str = "https://www.googleapis.com/oauth2/v1/certs"
+    firebase_credentials_json_client_x509_cert_url: str = ""
     firebase_storage_bucket: str = ""
     firestore_database_name: str = "(default)"
 

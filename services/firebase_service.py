@@ -31,6 +31,26 @@ logger = logging.getLogger(__name__)
 _firebase_initialized = False
 
 
+def _get_firebase_credentials_dict() -> dict:
+    """Reconstructs the Firebase Service Account JSON from individual env vars."""
+    settings = get_settings()
+    if not settings.firebase_credentials_json_project_id:
+        raise ValueError("FIREBASE_CREDENTIALS_JSON_PROJECT_ID is missing or empty")
+        
+    return {
+        "type": settings.firebase_credentials_json_type,
+        "project_id": settings.firebase_credentials_json_project_id,
+        "private_key_id": settings.firebase_credentials_json_private_key_id,
+        "private_key": settings.firebase_credentials_json_private_key.replace("\\n", "\n"),
+        "client_email": settings.firebase_credentials_json_client_email,
+        "client_id": settings.firebase_credentials_json_client_id,
+        "auth_uri": settings.firebase_credentials_json_auth_uri,
+        "token_uri": settings.firebase_credentials_json_token_uri,
+        "auth_provider_x509_cert_url": settings.firebase_credentials_json_auth_provider_x509_cert_url,
+        "client_x509_cert_url": settings.firebase_credentials_json_client_x509_cert_url,
+    }
+
+
 def initialize_firebase() -> None:
     """
     Initializes Firebase Admin SDK using service account credentials.
@@ -43,10 +63,7 @@ def initialize_firebase() -> None:
     settings = get_settings()
 
     try:
-        if not settings.firebase_credentials_json:
-            raise ValueError("FIREBASE_CREDENTIALS_JSON is missing or empty")
-            
-        cred_dict = json.loads(settings.firebase_credentials_json)
+        cred_dict = _get_firebase_credentials_dict()
         cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred, {
             "storageBucket": settings.firebase_storage_bucket,
@@ -139,7 +156,7 @@ def _get_db():
     """
     settings = get_settings()
     if settings.firestore_database_name != "(default)":
-        cred_dict = json.loads(settings.firebase_credentials_json)
+        cred_dict = _get_firebase_credentials_dict()
         return gcp_firestore.Client(
             project=cred_dict.get("project_id"),
             database=settings.firestore_database_name,

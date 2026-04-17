@@ -37,8 +37,12 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 def _validate_env() -> None:
     missing = []
-    if not settings.firebase_credentials_json:
-        missing.append("FIREBASE_CREDENTIALS_JSON")
+    if not settings.firebase_credentials_json_project_id:
+        missing.append("FIREBASE_CREDENTIALS_JSON_PROJECT_ID")
+    if not settings.firebase_credentials_json_private_key:
+        missing.append("FIREBASE_CREDENTIALS_JSON_PRIVATE_KEY")
+    if not settings.firebase_credentials_json_client_email:
+        missing.append("FIREBASE_CREDENTIALS_JSON_CLIENT_EMAIL")
     if not settings.firebase_storage_bucket:
         missing.append("FIREBASE_STORAGE_BUCKET")
     if not settings.admin_api_key:
