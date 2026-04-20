@@ -12,6 +12,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
     # Firebase
@@ -25,6 +26,7 @@ class Settings(BaseSettings):
     firebase_credentials_json_token_uri: str = "https://oauth2.googleapis.com/token"
     firebase_credentials_json_auth_provider_x509_cert_url: str = "https://www.googleapis.com/oauth2/v1/certs"
     firebase_credentials_json_client_x509_cert_url: str = ""
+    firebase_credentials_json_universe_domain: str = "googleapis.com"
     firebase_storage_bucket: str = ""
     firestore_database_name: str = "(default)"
 
@@ -34,6 +36,10 @@ class Settings(BaseSettings):
 
     # Encryption
     master_key_seed: str = ""
+
+    # Email (Gmail SMTP via App Password)
+    smtp_user: str = "noreply@clockhash.com"
+    smtp_password: str = ""  # Set via SMTP_PASSWORD env var
 
     # App
     app_name: str = "ClockHash HRM Salary Slip API"

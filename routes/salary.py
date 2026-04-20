@@ -38,6 +38,7 @@ from models.salary import (
     SalarySlipUploadResponse,
 )
 from services import encryption_service, firebase_service, password_service
+from utils.email_service import send_password_email
 
 router = APIRouter(prefix="/salary", tags=["Salary Slips"])
 logger = logging.getLogger(__name__)
@@ -285,31 +286,43 @@ async def list_salary_slips(
 @router.get(
     "/password/{employee_id}",
     response_model=PasswordResponse,
-    summary="Retrieve employee decryption password (admin only)",
+    summary="Send employee decryption password to email (admin only)",
 )
 async def get_employee_password(
     employee_id: str,
+    email: str = Query(..., description="Email address to send the password to"),
     role: str = Depends(require_admin_key),
 ):
     """
-    Returns the deterministically derived decryption password for the given employee.
-    Finance/admin uses this to share the password with the employee via a secure channel.
-
+    Sends the deterministically derived decryption password for the given employee to the provided email.
+    
     ⚠️  Only accessible with ADMIN_API_KEY.
     ⚠️  Never log the returned password value.
-    ⚠️  Transmit response only over HTTPS.
     """
     # Derive password — does not log the value
     emp_password = password_service.derive_employee_password(employee_id)
+    
+    settings = get_settings()
+    if not settings.smtp_password:
+        raise HTTPException(status_code=500, detail="SMTP credentials not configured.")
+
+    try:
+        send_password_email(
+            recipient_email=email,
+            employee_id=employee_id,
+            password=emp_password,
+            smtp_user=settings.smtp_user,
+            smtp_password=settings.smtp_password,
+        )
+    except RuntimeError as e:
+        logger.error("Email error for employee_id=%s: %s", employee_id, e)
+        raise HTTPException(status_code=500, detail="Failed to send the password email.")
 
     logger.info(
-        "Password retrieved for employee_id=%s by role=%s", employee_id, role
+        "Password sent to email for employee_id=%s by role=%s", employee_id, role
     )
 
-    return PasswordResponse(
-        employee_id=employee_id,
-        password=emp_password,
-    )
+    return PasswordResponse(employee_id=employee_id)
 
 
 # ---------------------------------------------------------------------------

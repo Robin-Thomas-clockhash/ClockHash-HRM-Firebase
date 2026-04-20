@@ -44,8 +44,4 @@ class PasswordResponse(BaseModel):
     Only accessible by admin API key.
     """
     employee_id: str
-    password: str
-    note: str = (
-        "This password decrypts the employee's salary slip PDFs. "
-        "Transmit only over secure channels."
-    )
+    message: str = "Password sent to the provided email address successfully."
